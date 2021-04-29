@@ -85,9 +85,6 @@ GO_TEST_FILTER=$(TESTFILTER)
 
 include build/makelib/golang.mk
 
-# setup helm charts
-include build/makelib/helm.mk
-
 # ====================================================================================
 # Targets
 
@@ -95,7 +92,7 @@ build.version:
 	@mkdir -p $(OUTPUT_DIR)
 	@echo "$(VERSION)" > $(OUTPUT_DIR)/version
 
-build.common: build.version helm.build mod.check
+build.common: build.version mod.check
 	@$(MAKE) go.init
 	@$(MAKE) go.validate
 

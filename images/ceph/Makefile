@@ -69,6 +69,8 @@ do.build: generate-csv-ceph-templates
 	else\
 		mkdir $(TEMP)/ceph-csv-templates;\
 	fi
+	@mkdir operator
+	@cp -r $(TEMP)/* operator; tar cvfz operator.tgz operator
 	@cd $(TEMP) && $(SED_CMD) 's|BASEIMAGE|$(BASEIMAGE)|g' Dockerfile
 	@if [ -z "$(BUILD_CONTAINER_IMAGE)" ]; then\
 		$(DOCKERCMD) build $(BUILD_ARGS) \

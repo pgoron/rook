@@ -74,6 +74,8 @@ ifeq ($(INCLUDE_CSV_TEMPLATES),true)
 else
 	mkdir $(TEMP)/ceph-csv-templates
 endif
+	@mkdir operator
+	@cp -r $(TEMP)/* operator; tar cvfz operator.tgz operator
 	@cd $(TEMP) && $(SED_IN_PLACE) 's|BASEIMAGE|$(BASEIMAGE)|g' Dockerfile
 	@if [ -z "$(BUILD_CONTAINER_IMAGE)" ]; then\
 		$(DOCKERCMD) build $(BUILD_ARGS) \

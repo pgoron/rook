@@ -274,23 +274,22 @@ func (r *ReconcileObjectStoreUser) createorUpdateCephUser(u *cephv1.CephObjectSt
 	var err error
 	user, err = r.adminOpsAPI.CreateUser(context.TODO(), *r.userConfig)
 	if err != nil {
-		if errors.Is(err, admin.ErrUserExists) {
-			user, err = r.adminOpsAPI.GetUser(context.TODO(), *r.userConfig)
-			if err != nil {
-				return errors.Wrapf(err, "failed to get details from ceph object user %v", &r.userConfig.ID)
-			}
-
-			return nil
+		if !errors.Is(err, admin.ErrUserExists) {
+			return errors.Wrapf(err, "failed to create ceph object user %q", u.Name)
 		}
-
-		return errors.Wrapf(err, "failed to create ceph object user %q", u.Name)
+		user, err = r.adminOpsAPI.GetUser(context.TODO(), *r.userConfig)
+		if err != nil {
+			return errors.Wrapf(err, "failed to get details from ceph object user %v", &r.userConfig.ID)
+		}
+		logger.Debugf("ceph object user %q already exist", u.Name)
+	} else {
+		logger.Infof("created ceph object user %q", u.Name)
 	}
 
 	// Set access and secret key
 	r.userConfig.Keys[0].AccessKey = user.Keys[0].AccessKey
 	r.userConfig.Keys[0].SecretKey = user.Keys[0].SecretKey
 
-	logger.Infof("created ceph object user %q", u.Name)
 	return nil
 }
 

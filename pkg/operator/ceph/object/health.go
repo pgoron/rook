@@ -18,7 +18,9 @@ package object
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/ceph/go-ceph/rgw/admin"
@@ -169,6 +171,11 @@ func (c *bucketChecker) checkObjectStoreHealth() error {
 	s3client, err := NewS3Agent(s3AccessKey, s3SecretKey, s3endpoint, false, tlsCert)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize s3 connection")
+	}
+	// Force the s3 client to use insecure TLS connection
+	s3client.Client.Config.HTTPClient.Transport = &http.Transport{
+		// #nosec G402 is enabled only for testing
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
 	// Force purge the s3 object before starting anything

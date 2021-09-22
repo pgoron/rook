@@ -207,6 +207,6 @@ func BuildTransportTLS(tlsCert []byte) *http.Transport {
 	caCertPool.AppendCertsFromPEM(tlsCert)
 
 	return &http.Transport{
-		TLSClientConfig: &tls.Config{RootCAs: caCertPool, MinVersion: tls.VersionTLS12},
+		TLSClientConfig: &tls.Config{RootCAs: caCertPool, MinVersion: tls.VersionTLS12, InsecureSkipVerify: true},
 	}
 }

@@ -194,7 +194,7 @@ func CreateDefaultCephConfig(context *clusterd.Context, clusterInfo *ClusterInfo
 
 	// extract a list of just the monitor names, which will populate the "mon initial members"
 	// and "mon hosts" global config field
-	monMembers, monHosts := PopulateMonHostMembers(clusterInfo.Monitors)
+	monMembers, monHosts := PopulateMonHostMembers(clusterInfo.Monitors, Msgr2port)
 
 	conf := &CephConfig{
 		GlobalConfig: &GlobalConfig{
@@ -254,7 +254,7 @@ func addClientConfigFileSection(configFile *ini.File, clientName, keyringPath st
 
 // PopulateMonHostMembers extracts a list of just the monitor names, which will populate the "mon initial members"
 // and "mon hosts" global config field
-func PopulateMonHostMembers(monitors map[string]*MonInfo) ([]string, []string) {
+func PopulateMonHostMembers(monitors map[string]*MonInfo, msgr2port int32) ([]string, []string) {
 	monMembers := make([]string, len(monitors))
 	monHosts := make([]string, len(monitors))
 
@@ -268,7 +268,7 @@ func PopulateMonHostMembers(monitors map[string]*MonInfo) ([]string, []string) {
 		// So whatever the previous monitor port was we keep it
 		currentMonPort := cephutil.GetPortFromEndpoint(monitor.Endpoint)
 
-		monPorts := [2]string{strconv.Itoa(int(Msgr2port)), strconv.Itoa(int(currentMonPort))}
+		monPorts := [2]string{strconv.Itoa(int(msgr2port)), strconv.Itoa(int(currentMonPort))}
 		msgr2Endpoint := net.JoinHostPort(monIP, monPorts[0])
 		msgr1Endpoint := net.JoinHostPort(monIP, monPorts[1])
 

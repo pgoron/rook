@@ -474,6 +474,12 @@ type MonSpec struct {
 	// AllowMultiplePerNode determines if we can run multiple monitors on the same node (not recommended)
 	// +optional
 	AllowMultiplePerNode bool `json:"allowMultiplePerNode,omitempty"`
+	// Port Ceph mons use to communicate amongst themselves prior to Ceph Nautilus
+	// +optional
+	Msgr1Port int32 `json:"msgr1Port,omitempty"`
+	// Port Ceph mons use for messenger v2 protocol introduced in Ceph Nautilus
+	// +optional
+	Msgr2Port int32 `json:"msgr2Port,omitempty"`
 	// StretchCluster is the stretch cluster specification
 	// +optional
 	StretchCluster *StretchClusterSpec `json:"stretchCluster,omitempty"`

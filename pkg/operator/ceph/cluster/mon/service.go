@@ -43,7 +43,7 @@ func (c *Cluster) createService(mon *monConfig) (string, error) {
 					Port: mon.Port,
 					// --public-bind-addr=IP with no IP:port has the mon listen on port 6789
 					// regardless of what port the mon advertises (--public-addr) to the outside.
-					TargetPort: intstr.FromInt(int(DefaultMsgr1Port)),
+					TargetPort: intstr.FromInt(int(c.spec.Mon.Msgr1Port)),
 					Protocol:   v1.ProtocolTCP,
 				},
 			},
@@ -56,7 +56,7 @@ func (c *Cluster) createService(mon *monConfig) (string, error) {
 	}
 
 	// If deploying Nautilus or newer we need a new port for the monitor service
-	addServicePort(svcDef, "tcp-msgr2", DefaultMsgr2Port)
+	addServicePort(svcDef, "tcp-msgr2", c.spec.Mon.Msgr2Port)
 
 	// Set the ClusterIP if the service does not exist and we expect a certain cluster IP
 	// For example, in disaster recovery the service might have been deleted accidentally, but we have the
@@ -82,7 +82,7 @@ func (c *Cluster) createService(mon *monConfig) (string, error) {
 	// mon endpoint are not actually like, they remain with the mgrs1 format
 	// however it's interesting to show that monitors can be addressed via 2 different ports
 	// in the end the service has msgr1 and msgr2 ports configured so it's not entirely wrong
-	logger.Infof("mon %q endpoint is [v2:%s:%s,v1:%s:%d]", mon.DaemonName, s.Spec.ClusterIP, strconv.Itoa(int(DefaultMsgr2Port)), s.Spec.ClusterIP, mon.Port)
+	logger.Infof("mon %q endpoint is [v2:%s:%s,v1:%s:%d]", mon.DaemonName, s.Spec.ClusterIP, strconv.Itoa(int(c.spec.Mon.Msgr2Port)), s.Spec.ClusterIP, mon.Port)
 
 	return s.Spec.ClusterIP, nil
 }

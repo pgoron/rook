@@ -82,13 +82,8 @@ func (c *ClusterController) configureExternalCephCluster(cluster *cluster) error
 			return errors.Wrap(err, "failed to populate config override config map")
 		}
 
-		msgr2Port := int32(3300)
-		if cluster.Spec.Mon.Msgr2Port != 0 {
-			msgr2Port = cluster.Spec.Mon.Msgr2Port
-		}
-
 		logger.Infof("creating %q secret", config.StoreName)
-		err = config.GetStore(c.context, c.namespacedName.Namespace, cluster.ClusterInfo.OwnerInfo).CreateOrUpdate(cluster.ClusterInfo, msgr2Port)
+		err = config.GetStore(c.context, c.namespacedName.Namespace, cluster.ClusterInfo.OwnerInfo).CreateOrUpdate(cluster.ClusterInfo, cluster.Spec.Mon.Msgr2Port)
 		if err != nil {
 			return errors.Wrap(err, "failed to update the global config")
 		}

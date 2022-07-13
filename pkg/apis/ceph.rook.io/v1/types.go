@@ -475,9 +475,11 @@ type MonSpec struct {
 	// +optional
 	AllowMultiplePerNode bool `json:"allowMultiplePerNode,omitempty"`
 	// Port Ceph mons use to communicate amongst themselves prior to Ceph Nautilus
+	// +kubebuilder:default=6789
 	// +optional
 	Msgr1Port int32 `json:"msgr1Port,omitempty"`
 	// Port Ceph mons use for messenger v2 protocol introduced in Ceph Nautilus
+	// +kubebuilder:default=3300
 	// +optional
 	Msgr2Port int32 `json:"msgr2Port,omitempty"`
 	// StretchCluster is the stretch cluster specification

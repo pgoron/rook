@@ -544,15 +544,10 @@ func (c *Cluster) clusterInfoToMonConfig(excludedMon string) []*monConfig {
 func (c *Cluster) newMonConfig(monID int, zone string) *monConfig {
 	daemonName := k8sutil.IndexToName(monID)
 
-	msgr1Port := DefaultMsgr1Port
-	if c.spec.Mon.Msgr1Port != 0 {
-		msgr1Port = c.spec.Mon.Msgr1Port
-	}
-
 	return &monConfig{
 		ResourceName: resourceName(daemonName),
 		DaemonName:   daemonName,
-		Port:         msgr1Port,
+		Port:         c.spec.Mon.Msgr1Port,
 		Zone:         zone,
 		DataPathMap: config.NewStatefulDaemonDataPathMap(
 			c.spec.DataDirHostPath, dataDirRelativeHostPath(daemonName), config.MonType, daemonName, c.Namespace),
@@ -1015,14 +1010,9 @@ func (c *Cluster) saveMonConfig() error {
 		return errors.Wrap(err, "failed to persist expected mons")
 	}
 
-	msgr2Port := DefaultMsgr2Port
-	if c.spec.Mon.Msgr2Port != 0 {
-		msgr2Port = c.spec.Mon.Msgr2Port
-	}
-
 	// Every time the mon config is updated, must also update the global config so that all daemons
 	// have the most updated version if they restart.
-	if err := config.GetStore(c.context, c.Namespace, c.ownerInfo).CreateOrUpdate(c.ClusterInfo, msgr2Port); err != nil {
+	if err := config.GetStore(c.context, c.Namespace, c.ownerInfo).CreateOrUpdate(c.ClusterInfo, c.spec.Mon.Msgr2Port); err != nil {
 		return errors.Wrap(err, "failed to update the global config")
 	}
 

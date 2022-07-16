@@ -142,7 +142,7 @@ func (r *ReconcileObjectZoneGroup) reconcile(request reconcile.Request) (reconci
 	}
 
 	// Make sure a CephCluster is present otherwise do nothing
-	_, isReadyToReconcile, cephClusterExists, reconcileResponse := opcontroller.IsReadyToReconcile(r.client, r.context, request.NamespacedName, controllerName)
+	cephCluster, isReadyToReconcile, cephClusterExists, reconcileResponse := opcontroller.IsReadyToReconcile(r.client, r.context, request.NamespacedName, controllerName)
 	if !isReadyToReconcile {
 		// This handles the case where the Ceph Cluster is gone and we want to delete that CR
 		if !cephObjectZoneGroup.GetDeletionTimestamp().IsZero() && !cephClusterExists {
@@ -161,7 +161,7 @@ func (r *ReconcileObjectZoneGroup) reconcile(request reconcile.Request) (reconci
 	}
 
 	// Populate clusterInfo during each reconcile
-	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace)
+	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace, &cephCluster.Spec.Mon)
 	if err != nil {
 		return reconcile.Result{}, errors.Wrap(err, "failed to populate cluster info")
 	}

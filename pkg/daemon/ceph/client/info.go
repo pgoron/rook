@@ -46,6 +46,7 @@ type ClusterInfo struct {
 	name              string
 	OsdUpgradeTimeout time.Duration
 	NetworkSpec       cephv1.NetworkSpec
+	MonSpec           cephv1.MonSpec
 }
 
 // MonInfo is a collection of information about a Ceph mon.

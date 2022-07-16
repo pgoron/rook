@@ -23,6 +23,7 @@ import (
 	"path"
 
 	"github.com/pkg/errors"
+	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	"github.com/rook/rook/pkg/daemon/ceph/client"
 )
 
@@ -53,6 +54,10 @@ func CreateTestClusterInfo(monCount int) *client.ClusterInfo {
 		},
 		Monitors:  map[string]*client.MonInfo{},
 		OwnerInfo: ownerInfo,
+		MonSpec: cephv1.MonSpec{
+			Msgr1Port: 6789,
+			Msgr2Port: 3300,
+		},
 	}
 	mons := []string{"a", "b", "c", "d", "e"}
 	for i := 0; i < monCount; i++ {

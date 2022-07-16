@@ -61,10 +61,10 @@ func GetStore(context *clusterd.Context, namespace string, ownerInfo *k8sutil.Ow
 }
 
 // CreateOrUpdate creates or updates the stored Ceph config based on the cluster info.
-func (s *Store) CreateOrUpdate(clusterInfo *cephclient.ClusterInfo, msgr2Port int32) error {
+func (s *Store) CreateOrUpdate(clusterInfo *cephclient.ClusterInfo) error {
 	ctx := context.TODO()
 	// these are used for all ceph daemons on the commandline and must *always* be stored
-	if err := s.createOrUpdateMonHostSecrets(ctx, clusterInfo, msgr2Port); err != nil {
+	if err := s.createOrUpdateMonHostSecrets(ctx, clusterInfo); err != nil {
 		return errors.Wrap(err, "failed to store mon host configs")
 	}
 
@@ -72,11 +72,11 @@ func (s *Store) CreateOrUpdate(clusterInfo *cephclient.ClusterInfo, msgr2Port in
 }
 
 // update "mon_host" and "mon_initial_members" in the stored config
-func (s *Store) createOrUpdateMonHostSecrets(ctx context.Context, clusterInfo *cephclient.ClusterInfo, msgr2Port int32) error {
+func (s *Store) createOrUpdateMonHostSecrets(ctx context.Context, clusterInfo *cephclient.ClusterInfo) error {
 
 	// extract a list of just the monitor names, which will populate the "mon initial members"
 	// and "mon hosts" global config field
-	members, hosts := cephclient.PopulateMonHostMembers(clusterInfo.Monitors, msgr2Port)
+	members, hosts := cephclient.PopulateMonHostMembers(clusterInfo)
 
 	// store these in a secret instead of the configmap; secrets are required by CSI drivers
 	secret := &v1.Secret{

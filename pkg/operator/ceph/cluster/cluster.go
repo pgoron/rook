@@ -179,7 +179,7 @@ func (c *ClusterController) initializeCluster(cluster *cluster) error {
 		}
 	}
 
-	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, cluster.Namespace)
+	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, cluster.Namespace, &cluster.Spec.Mon)
 	if err != nil {
 		logger.Infof("clusterInfo not yet found, must be a new cluster")
 	} else {

@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	"github.com/rook/rook/pkg/clusterd"
 	cephclient "github.com/rook/rook/pkg/daemon/ceph/client"
 	clienttest "github.com/rook/rook/pkg/daemon/ceph/client/test"
@@ -161,8 +162,12 @@ func TestAttach(t *testing.T) {
 			called:   0,
 		},
 	}
+	monSpec := cephv1.MonSpec{
+		Msgr1Port: 6789,
+		Msgr2Port: 3300,
+	}
 	ownerInfo := cephclient.NewMinimumOwnerInfoWithOwnerRef()
-	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, ownerInfo)
+	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, &monSpec, ownerInfo)
 	assert.NoError(t, err)
 	devicePath, err := vm.Attach("image1", "testpool", "admin", "never-gonna-give-you-up", clusterNamespace)
 	assert.Equal(t, "/dev/rbd3", devicePath)
@@ -243,8 +248,12 @@ func TestDetach(t *testing.T) {
 			called:   0,
 		},
 	}
+	monSpec := cephv1.MonSpec{
+		Msgr1Port: 6789,
+		Msgr2Port: 3300,
+	}
 	ownerInfo := cephclient.NewMinimumOwnerInfoWithOwnerRef()
-	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, ownerInfo)
+	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, &monSpec, ownerInfo)
 	assert.NoError(t, err)
 	err = vm.Detach("image1", "testpool", "admin", "", clusterNamespace, false)
 	assert.Nil(t, err)
@@ -299,8 +308,12 @@ func TestDetachCustomKeyring(t *testing.T) {
 			called:   0,
 		},
 	}
+	monSpec := cephv1.MonSpec{
+		Msgr1Port: 6789,
+		Msgr2Port: 3300,
+	}
 	ownerInfo := cephclient.NewMinimumOwnerInfoWithOwnerRef()
-	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, ownerInfo)
+	_, _, _, err = mon.CreateOrLoadClusterInfo(context, clusterNamespace, &monSpec, ownerInfo)
 	assert.NoError(t, err)
 	err = vm.Detach("image1", "testpool", "user1", "", clusterNamespace, false)
 	assert.Nil(t, err)

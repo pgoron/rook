@@ -187,7 +187,7 @@ func (r *ReconcileFilesystemMirror) reconcile(request reconcile.Request) (reconc
 	r.cephClusterSpec = &cephCluster.Spec
 
 	// Populate clusterInfo
-	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace)
+	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace, &cephCluster.Spec.Mon)
 	if err != nil {
 		return opcontroller.ImmediateRetryResult, errors.Wrap(err, "failed to populate cluster info")
 	}

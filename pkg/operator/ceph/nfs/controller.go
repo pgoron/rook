@@ -188,7 +188,7 @@ func (r *ReconcileCephNFS) reconcile(request reconcile.Request) (reconcile.Resul
 
 	// Populate clusterInfo
 	// Always populate it during each reconcile
-	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace)
+	r.clusterInfo, _, _, err = mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace, &cephCluster.Spec.Mon)
 	if err != nil {
 		return reconcile.Result{}, errors.Wrap(err, "failed to populate cluster info")
 	}

@@ -219,6 +219,7 @@ func (c *ClusterMap) GetClusterInfo(namespace string) *cephClient.ClusterInfo {
 
 	clusterInfo := cephClient.NewClusterInfo(namespace, cluster.ObjectMeta.GetName())
 	clusterInfo.CephCred.Username = cephClient.AdminUsername
+	clusterInfo.MonSpec = cluster.Spec.Mon
 	return clusterInfo
 }
 

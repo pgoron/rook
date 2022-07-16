@@ -31,6 +31,7 @@ import (
 
 	"github.com/coreos/pkg/capnslog"
 	"github.com/go-ini/ini"
+	cephv1 "github.com/rook/rook/pkg/apis/ceph.rook.io/v1"
 	"github.com/rook/rook/pkg/clusterd"
 	cephver "github.com/rook/rook/pkg/operator/ceph/version"
 	"github.com/stretchr/testify/assert"
@@ -46,6 +47,10 @@ func TestCreateDefaultCephConfig(t *testing.T) {
 			"node1": {Name: "mon1", Endpoint: "10.0.0.2:6789"},
 		},
 		CephVersion: cephver.Nautilus,
+		MonSpec: cephv1.MonSpec{
+			Msgr1Port: 6789,
+			Msgr2Port: 3300,
+		},
 	}
 
 	// start with INFO level logging

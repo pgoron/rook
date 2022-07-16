@@ -472,7 +472,7 @@ func (c *Cluster) initClusterInfo(cephVersion cephver.CephVersion) error {
 	var err error
 
 	// get the cluster info from secret
-	c.ClusterInfo, c.maxMonID, c.mapping, err = CreateOrLoadClusterInfo(c.context, c.Namespace, c.ownerInfo)
+	c.ClusterInfo, c.maxMonID, c.mapping, err = CreateOrLoadClusterInfo(c.context, c.Namespace, &c.spec.Mon, c.ownerInfo)
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster info")
 	}
@@ -1012,7 +1012,7 @@ func (c *Cluster) saveMonConfig() error {
 
 	// Every time the mon config is updated, must also update the global config so that all daemons
 	// have the most updated version if they restart.
-	if err := config.GetStore(c.context, c.Namespace, c.ownerInfo).CreateOrUpdate(c.ClusterInfo, c.spec.Mon.Msgr2Port); err != nil {
+	if err := config.GetStore(c.context, c.Namespace, c.ownerInfo).CreateOrUpdate(c.ClusterInfo); err != nil {
 		return errors.Wrap(err, "failed to update the global config")
 	}
 

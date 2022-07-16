@@ -274,7 +274,7 @@ func TestCheckHealthNotFound(t *testing.T) {
 	}
 	ownerInfo := cephclient.NewMinimumOwnerInfoWithOwnerRef()
 	c := New(context, "ns", cephv1.ClusterSpec{}, ownerInfo, &sync.Mutex{})
-	setCommonMonProperties(c, 2, cephv1.MonSpec{Count: 3, AllowMultiplePerNode: true}, "myversion")
+	setCommonMonProperties(c, 2, cephv1.MonSpec{Count: 3, Msgr1Port: 6789, Msgr2Port: 3300, AllowMultiplePerNode: true}, "myversion")
 	c.waitForStart = false
 	defer os.RemoveAll(c.context.ConfigDir)
 

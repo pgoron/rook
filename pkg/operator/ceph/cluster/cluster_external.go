@@ -49,7 +49,7 @@ func (c *ClusterController) configureExternalCephCluster(cluster *cluster) error
 	// loop until we find the secret necessary to connect to the external cluster
 	// then populate clusterInfo
 
-	cluster.ClusterInfo = mon.PopulateExternalClusterInfo(c.context, c.namespacedName.Namespace, cluster.ownerInfo)
+	cluster.ClusterInfo = mon.PopulateExternalClusterInfo(c.context, c.namespacedName.Namespace, &cluster.Spec.Mon, cluster.ownerInfo)
 	cluster.ClusterInfo.SetName(c.namespacedName.Name)
 
 	if !client.IsKeyringBase64Encoded(cluster.ClusterInfo.CephCred.Secret) {
@@ -83,7 +83,7 @@ func (c *ClusterController) configureExternalCephCluster(cluster *cluster) error
 		}
 
 		logger.Infof("creating %q secret", config.StoreName)
-		err = config.GetStore(c.context, c.namespacedName.Namespace, cluster.ClusterInfo.OwnerInfo).CreateOrUpdate(cluster.ClusterInfo, cluster.Spec.Mon.Msgr2Port)
+		err = config.GetStore(c.context, c.namespacedName.Namespace, cluster.ClusterInfo.OwnerInfo).CreateOrUpdate(cluster.ClusterInfo)
 		if err != nil {
 			return errors.Wrap(err, "failed to update the global config")
 		}

@@ -190,12 +190,13 @@ func (r *ReconcileCephBlockPool) reconcile(request reconcile.Request) (reconcile
 	}
 
 	// Populate clusterInfo during each reconcile
-	clusterInfo, _, _, err := mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace)
+	clusterInfo, _, _, err := mon.LoadClusterInfo(r.context, request.NamespacedName.Namespace, &cephCluster.Spec.Mon)
 	if err != nil {
 		return opcontroller.ImmediateRetryResult, errors.Wrap(err, "failed to populate cluster info")
 	}
 	r.clusterInfo = clusterInfo
 	r.clusterInfo.NetworkSpec = cephCluster.Spec.Network
+	r.clusterInfo.MonSpec = cephCluster.Spec.Mon
 
 	// Initialize the channel for this pool
 	// This allows us to track multiple CephBlockPool in the same namespace

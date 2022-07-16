@@ -66,11 +66,11 @@ func TestStore(t *testing.T) {
 	i1 := clienttest.CreateTestClusterInfo(1) // cluster w/ one mon
 	i3 := clienttest.CreateTestClusterInfo(3) // same cluster w/ 3 mons
 
-	err := s.CreateOrUpdate(i1, 3300)
+	err := s.CreateOrUpdate(i1)
 	assert.NoError(t, err)
 	assertConfigStore(i1)
 
-	err = s.CreateOrUpdate(i3, 3300)
+	err = s.CreateOrUpdate(i3)
 	assert.NoError(t, err)
 	assertConfigStore(i3)
 }
@@ -84,7 +84,7 @@ func TestEnvVarsAndFlags(t *testing.T) {
 	ownerInfo := cephclient.NewMinimumOwnerInfoWithOwnerRef()
 
 	s := GetStore(ctx, ns, ownerInfo)
-	err := s.CreateOrUpdate(clienttest.CreateTestClusterInfo(3), 3300)
+	err := s.CreateOrUpdate(clienttest.CreateTestClusterInfo(3))
 	assert.NoError(t, err)
 
 	v := StoredMonHostEnvVars()

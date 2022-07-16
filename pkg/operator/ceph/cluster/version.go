@@ -175,7 +175,7 @@ func (c *cluster) validateCephVersion(version *cephver.CephVersion) error {
 	// state we are in and if we should upgrade or not
 
 	// Try to load clusterInfo so we can compare the running version with the one from the spec image
-	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, c.Namespace)
+	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, c.Namespace, &c.Spec.Mon)
 	if err == nil {
 		// Write connection info (ceph config file and keyring) for ceph commands
 		err = mon.WriteConnectionConfig(c.context, clusterInfo)

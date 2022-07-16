@@ -244,7 +244,7 @@ func (c *ClusterController) getCephHosts(namespace string) ([]string, error) {
 }
 
 func (c *ClusterController) getCleanUpDetails(namespace string) (string, string, error) {
-	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, namespace)
+	clusterInfo, _, _, err := mon.LoadClusterInfo(c.context, namespace, nil)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to get cluster info")
 	}

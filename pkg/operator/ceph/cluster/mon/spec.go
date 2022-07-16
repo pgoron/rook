@@ -246,6 +246,10 @@ func (c *Cluster) makeChownInitContainer(monConfig *monConfig) corev1.Container 
 }
 
 func (c *Cluster) makeMonFSInitContainer(monConfig *monConfig) corev1.Container {
+	// Always use vector-based address with protocol version to not let ceph decide protocol
+	// version by itself based on port number
+	publicAddrVect := fmt.Sprintf("[v1:%s:%d]", monConfig.PublicIP, monConfig.Port)
+
 	return corev1.Container{
 		Name: "init-mon-fs",
 		Command: []string{
@@ -255,7 +259,7 @@ func (c *Cluster) makeMonFSInitContainer(monConfig *monConfig) corev1.Container 
 			controller.DaemonFlags(c.ClusterInfo, &c.spec, monConfig.DaemonName),
 			// needed so we can generate an initial monmap
 			// otherwise the mkfs will say: "0  no local addrs match monmap"
-			config.NewFlag("public-addr", monConfig.PublicIP),
+			config.NewFlag("public-addrv", publicAddrVect),
 			"--mkfs",
 		),
 		Image:           c.spec.CephVersion.Image,
@@ -269,15 +273,16 @@ func (c *Cluster) makeMonFSInitContainer(monConfig *monConfig) corev1.Container 
 
 func (c *Cluster) makeMonDaemonContainer(monConfig *monConfig) corev1.Container {
 	podIPEnvVar := "ROOK_POD_IP"
-	publicAddr := monConfig.PublicIP
 
 	// Handle the non-default port for host networking. If host networking is not being used,
 	// the service created elsewhere will handle the non-default port redirection to the default port inside the container.
 	if c.spec.Network.IsHost() && monConfig.Port != DefaultMsgr1Port {
 		logger.Warningf("Starting mon %s with host networking on a non-default port %d. The mon must be failed over before enabling msgr2.",
 			monConfig.DaemonName, monConfig.Port)
-		publicAddr = fmt.Sprintf("%s:%d", publicAddr, monConfig.Port)
 	}
+	// Always use vector-based address with protocol version to not let ceph decide protocol
+	// version by itself based on port number
+	publicAddrVect := fmt.Sprintf("[v1:%s:%d]", monConfig.PublicIP, monConfig.Port)
 
 	container := corev1.Container{
 		Name: "mon",
@@ -289,7 +294,7 @@ func (c *Cluster) makeMonDaemonContainer(monConfig *monConfig) corev1.Container 
 			"--foreground",
 			// If the mon is already in the monmap, when the port is left off of --public-addr,
 			// it will still advertise on the previous port b/c monmap is saved to mon database.
-			config.NewFlag("public-addr", publicAddr),
+			config.NewFlag("public-addrv", publicAddrVect),
 			// Set '--setuser-match-path' so that existing directory owned by root won't affect the daemon startup.
 			// For existing data store owned by root, the daemon will continue to run as root
 			//

@@ -149,6 +149,36 @@ func GetNodeSchedulable(node v1.Node) bool {
 	if node.Spec.Unschedulable {
 		return false
 	}
+
+	// NB on below test:
+	// GetNodeSchedulable(node) is used by cluster controller when a node update event is received.
+	// See https://github.com/criteo-forks/rook/blob/1.3-criteo/pkg/operator/ceph/cluster/controller.go#L594
+	// This method filters node update events to keep only updates affecting node schedulability
+	// by checking if node.Spec.Unschedulable field has changed.
+	//
+	// The implementation misses the fact that k8s node-controller will add/remove
+	// node.kubernetes.io/unschedulable taint shortly after someone update
+	// node.Spec.Unschedulable value.
+	// See https://github.com/kubernetes/kubernetes/blob/v1.18.7/pkg/controller/nodelifecycle/node_lifecycle_controller.go#L628
+	//
+	// It means that during uncordon sequence:
+	// 1. Node will be updated a first time with node.Spec.Unschedulable=false but still
+	//    with node.kubernetes.io/unschedulable taint set. Rook will discard the event due to the taint.
+	// 2. Then k8s node controller will updates node to remove the node.kubernetes.io/unschedulable taint.
+	//    Rook will discard the event because node because node.Spec.Unschedulable hasn't changed
+	//    => Uncordon node isn't processed by rook
+	//
+	// To prevent new nodes to stay out of cluster until we restart rook operator, we include
+	// presence of node.kubernetes.io/unschedulable in schedulability test. (New nodes are initially cordoned
+	// and then uncordon when ready)
+	//
+	// NB2: no need to push this bugfix upstream, node update handler logic has changed in last versions of rook.
+	for _, taint := range node.Spec.Taints {
+		if taint.Key == v1.TaintNodeUnschedulable {
+			return false
+		}
+	}
+
 	return true
 }
 

@@ -67,6 +67,11 @@ func testCreateECPool(t *testing.T, overwrite bool, compressionMode string) {
 				assert.Equal(t, "mypoolprofile", args[6])
 				return "", nil
 			}
+			if args[2] == "get" {
+				assert.Equal(t, "mypool", args[3])
+				assert.Equal(t, "all", args[4])
+				return "{\"pool\":\"mypool\",\"pool_id\":5,\"size\":3,\"min_size\":2,\"pg_num\":8,\"pgp_num\":8,\"crush_rule\":\"mypool\",\"hashpspool\":true,\"nodelete\":false,\"nopgchange\":false,\"nosizechange\":false,\"write_fadvise_dontneed\":false,\"noscrub\":false,\"nodeep-scrub\":false,\"use_gmt_hitset\":true,\"fast_read\":0,\"recovery_priority\":5,\"pg_autoscale_mode\":\"on\",\"pg_autoscale_bias\":4,\"bulk\":false}", nil
+			}
 			if args[2] == "set" {
 				assert.Equal(t, "mypool", args[3])
 				if args[4] == "allow_ec_overwrites" {

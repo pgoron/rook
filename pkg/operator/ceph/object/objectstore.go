@@ -752,11 +752,24 @@ func CreatePools(context *Context, clusterSpec *cephv1.ClusterSpec, metadataPool
 		metadataPoolPGs = cephclient.DefaultPGCount
 	}
 
+	// honor pg_num_min for metadata pools if provided by user
+	metadataPoolPgNumMin, ok := metadataPool.Parameters["pg_num_min"]
+	if ok {
+		metadataPoolPGs = metadataPoolPgNumMin
+	}
+
 	if err := createSimilarPools(context, append(metadataPools, rootPool), clusterSpec, metadataPool, metadataPoolPGs); err != nil {
 		return errors.Wrap(err, "failed to create metadata pools")
 	}
 
-	if err := createSimilarPools(context, []string{dataPoolName}, clusterSpec, dataPool, cephclient.DefaultPGCount); err != nil {
+	// honor pg_num_min for data pools if provided by user
+	dataPoolPGs := cephclient.DefaultPGCount
+	dataPoolPgNumMin, ok := dataPool.Parameters["pg_num_min"]
+	if !ok {
+		dataPoolPGs = dataPoolPgNumMin
+	}
+
+	if err := createSimilarPools(context, []string{dataPoolName}, clusterSpec, dataPool, dataPoolPGs); err != nil {
 		return errors.Wrap(err, "failed to create data pool")
 	}
 
